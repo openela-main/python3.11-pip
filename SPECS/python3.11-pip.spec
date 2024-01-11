@@ -12,7 +12,7 @@
 
 Name:           python%{python3_pkgversion}-%{srcname}
 Version:        %{base_version}%{?prerel:~%{prerel}}
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 # We bundle a lot of libraries with pip, which itself is under MIT license.
@@ -80,6 +80,14 @@ Patch2:         nowarn-pip._internal.main.patch
 # (This also breaks Python's test suite when warnings are treated as errors.)
 # Upstream issue: https://github.com/pypa/packaging/issues/368
 Patch3:         no-version-warning.patch
+
+# CVE-2007-4559, PEP-721, PEP-706: Use tarfile.data_filter for extracting
+# - Minimal downstream-only patch, to be replaced by upstream solution
+#   proposed in https://github.com/pypa/pip/pull/12214
+# - Test patch submitted upstream in the above pull request
+# - Patch for vendored distlib, accepted upstream:
+#   https://github.com/pypa/distlib/pull/201
+Patch4:         cve-2007-4559-tarfile.patch
 
 # Downstream only patch
 # Users might have local installations of pip from using
@@ -389,34 +397,42 @@ fi
 %{python_wheel_dir}/%{python_wheel_name}
 
 %changelog
+* Tue Aug 08 2023 Petr Viktorin <pviktori@redhat.com> - 22.3.1-4
+- Use tarfile.data_filter for extracting (CVE-2007-4559, PEP-721, PEP-706)
+Resolves: RHBZ#2218249
+
+* Mon Mar 06 2023 Lumír Balhar <lbalhar@redhat.com> - 22.3.1-3
+- Fix changelog to contain Fedora contributors
+Resolves: RHEL-232
+
 * Mon Jan 30 2023 Charalampos Stratakis <cstratak@redhat.com> - 22.3.1-2
 - Add BuildRequires on python3.11-rpm-macros
 
 * Wed Aug 03 2022 Charalampos Stratakis <cstratak@redhat.com> - 22.3.1-1
 - Initial package
 - Fedora contributions by:
-      # Bill Nottingham <notting@fedoraproject.org>
-      # Charalampos Stratakis <cstratak@redhat.com>
-      # David Malcolm <dmalcolm@redhat.com>
-      # Dennis Gilmore <dennis@ausil.us>
-      # Jon Ciesla <limburgher@gmail.com>
-      # Karolina Surma <ksurma@redhat.com>
-      # Kevin Fenzi <kevin@fedoraproject.org>
-      # Kevin Kofler <Kevin@tigcc.ticalc.org>
-      # Luke Macken <lmacken@redhat.com>
-      # Lumir Balhar <lbalhar@redhat.com>
-      # Marcel Plch <mplch@redhat.com>
-      # Matej Stuchlik <mstuchli@redhat.com>
-      # Michal Cyprian <m.cyprian@gmail.com>
-      # Miro Hrončok <miro@hroncok.cz>
-      # Orion Poplawski <orion@cora.nwra.com>
-      # Pádraig Brady <P@draigBrady.com>
-      # Peter Halliday <hoangelos@fedoraproject.org>
-      # Petr Viktorin <pviktori@redhat.com>
-      # Robert Kuska <rkuska@redhat.com>
-      # Slavek Kabrda <bkabrda@redhat.com>
-      # Tim Flink <tflink@fedoraproject.org>
-      # Tomáš Hrnčiar <thrnciar@redhat.com>
-      # Tomas Orsava <torsava@redhat.com>
-      # Toshio Kuratomi <toshio@fedoraproject.org>
-      # Ville Skyttä <ville.skytta@iki.fi>
+    Bill Nottingham <notting@fedoraproject.org>
+    Charalampos Stratakis <cstratak@redhat.com>
+    David Malcolm <dmalcolm@redhat.com>
+    Dennis Gilmore <dennis@ausil.us>
+    Jon Ciesla <limburgher@gmail.com>
+    Karolina Surma <ksurma@redhat.com>
+    Kevin Fenzi <kevin@fedoraproject.org>
+    Kevin Kofler <Kevin@tigcc.ticalc.org>
+    Luke Macken <lmacken@redhat.com>
+    Lumir Balhar <lbalhar@redhat.com>
+    Marcel Plch <mplch@redhat.com>
+    Matej Stuchlik <mstuchli@redhat.com>
+    Michal Cyprian <m.cyprian@gmail.com>
+    Miro Hrončok <miro@hroncok.cz>
+    Orion Poplawski <orion@cora.nwra.com>
+    Pádraig Brady <P@draigBrady.com>
+    Peter Halliday <hoangelos@fedoraproject.org>
+    Petr Viktorin <pviktori@redhat.com>
+    Robert Kuska <rkuska@redhat.com>
+    Slavek Kabrda <bkabrda@redhat.com>
+    Tim Flink <tflink@fedoraproject.org>
+    Tomáš Hrnčiar <thrnciar@redhat.com>
+    Tomas Orsava <torsava@redhat.com>
+    Toshio Kuratomi <toshio@fedoraproject.org>
+    Ville Skyttä <ville.skytta@iki.fi>
