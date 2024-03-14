@@ -12,7 +12,7 @@
 
 Name:           python%{python3_pkgversion}-%{srcname}
 Version:        %{base_version}%{?prerel:~%{prerel}}
-Release:        4%{?dist}
+Release:        4%{?dist}.1
 Summary:        A tool for installing and managing Python packages
 
 # We bundle a lot of libraries with pip, which itself is under MIT license.
@@ -183,6 +183,11 @@ BuildRequires:  python%{python3_pkgversion}-installer
 %endif
 
 
+# pip has to require explicit version of python that provides
+# filters in tarfile module (fix for CVE-2007-4559).
+Requires: python%{python3_pkgversion} >= 3.11.4-3
+
+
 # This was previously required and we keep it recommended because a lot of
 # sdists installed via pip will try to import setuptools.
 # But pip doesn't actually require setuptools.
@@ -205,6 +210,8 @@ Packages" or "Pip Installs Python".
 %package -n     %{python_wheel_pkg_prefix}-%{srcname}-wheel
 Summary:        The pip wheel
 Requires:       ca-certificates
+# Older Python does not provide tarfile filters (fix for CVE-2007-4559).
+Conflicts:      python%{python3_pkgversion} < 3.11.4-3
 
 # Virtual provides for the packages bundled by pip:
 %{bundled %{python3_pkgversion}}
@@ -336,6 +343,10 @@ pytest_k='not completion'
 %{python_wheel_dir}/%{python_wheel_name}
 
 %changelog
+* Wed Feb 14 2024 Tomáš Hrnčiar <thrnciar@redhat.com> - 22.3.1-4.1
+- Require Python with tarfile filters
+Resolves: RHEL-25456
+
 * Tue Aug 08 2023 Petr Viktorin <pviktori@redhat.com> - 22.3.1-4
 - Use tarfile.data_filter for extracting (CVE-2007-4559, PEP-721, PEP-706)
 Resolves: RHBZ#2218247
